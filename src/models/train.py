@@ -74,6 +74,13 @@ def train_model(data_path, model_output_path):
     joblib.dump(model, model_output_path)
     print(f"✅ HOÀN TẤT! Mô hình đã được lưu an toàn tại: {model_output_path}")
 
+def predict(input_data):
+    model_path = os.path.join(os.path.dirname(__file__), 'xgboost.pkl')
+    model = joblib.load(model_path)
+    df = pd.DataFrame([input_data])
+    prediction = model.predict(df)
+    return prediction[0]
+
 if __name__ == "__main__":    
     INPUT_FILE = "../../notebook/preprocessing/VN_housing_processed.csv"
     MODEL_OUTPUT = "../../src/models/xgboost.pkl" 

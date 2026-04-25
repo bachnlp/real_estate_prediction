@@ -62,19 +62,41 @@ def impute_missing_values(df):
             df[col] = df[col].fillna(df[col].median())
     return df
 
-def encode_categorical_columns(df):
-    """Encode nominal columns with LabelEncoder and ordinal columns with mapping."""
-    le = LabelEncoder()
-    
-    # 1. Nominal Encoding (Các biến không quan trọng thứ tự)
+import joblib
+import os
+
+def encode_categorical_columns(df, is_training=True):
+    """Encode categorical columns and save/load the encoders."""
     nominal_cols = ['Quận', 'Huyện', 'Loại hình nhà ở', 'Giấy tờ pháp lý']
-    for col in nominal_cols:
-        if col in df.columns:
-            df[col] = le.fit_transform(df[col].astype(str))
-            
-    # 2. Ordinal Encoding cho price_level (Bảo toàn thứ tự Budget < Mid-range < Premium)
+    
+    # Đường dẫn lưu file encoders (bạn có thể chỉnh lại cho khớp cấu trúc)
+    encoder_path = os.path.join(os.path.dirname(__file__), '../models/label_encoders.pkl')
+    
+    if is_training:
+        # LÚC TRAIN: Tạo mới, học dữ liệu và lưu lại
+        encoders = {}
+        for col in nominal_cols:
+            if col in df.columns:
+                from sklearn.preprocessing import LabelEncoder
+                le = LabelEncoder()
+                df[col] = le.fit_transform(df[col].astype(str))
+                encoders[col] = le
+        
+        os.makedirs(os.path.dirname(encoder_path), exist_ok=True)
+        joblib.dump(encoders, encoder_path)
+    else:
+        # LÚC DEPLOY (Inference): Chỉ load file lên để biến chữ thành số
+        encoders = joblib.load(encoder_path)
+        for col in nominal_cols:
+            if col in df.columns:
+                le = encoders[col]
+                # Bắt lỗi nếu có category mới tinh người dùng nhập vào
+                # Biến nó thành giá trị mặc định (vd: index 0)
+                df[col] = df[col].astype(str).apply(lambda x: x if x in le.classes_ else le.classes_[0])
+                df[col] = le.transform(df[col])
+
+    # Giữ nguyên phần giá (price_level) của bạn
     if 'price_level' in df.columns:
-        # Ép kiểu về string để tránh lỗi nếu dữ liệu đang là Category type
         price_mapping = {'Budget': 0, 'Mid-range': 1, 'Premium': 2}
         df['price_level'] = df['price_level'].astype(str).map(price_mapping)
         

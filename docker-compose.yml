@@ -1,0 +1,25 @@
+services:
+  db:
+    image: postgres:15-alpine
+    container_name: hanoi_housing_db
+    environment:
+      - POSTGRES_USER=admin
+      - POSTGRES_PASSWORD=123456
+      - POSTGRES_DB=housing_db
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  api:
+    build: .
+    container_name: hanoi_housing_api
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./src:/app/src
+    depends_on:
+      - db
+
+volumes:
+  postgres_data:
