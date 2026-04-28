@@ -69,7 +69,7 @@ protobuf==6.32.1
 psutil==7.2.2
 psycopg2-binary==2.9.11
 pure_eval==0.2.3
-pyarrow==21.0.0
+pyarrow>=16.0.0
 pydantic==2.12.0
 pydantic_core==2.41.1
 pydeck==0.9.1
