@@ -38,7 +38,7 @@ if st.button("Predict Price", use_container_width=True):
         "Giấy tờ pháp lý": giay_to
     }
 
-    API_URL = "http://localhost:8000/predict"
+    API_URL = "https://api-hanoi-housing.onrender.com/predict"
     try:
         with st.spinner("Predicting..."):
             response = requests.post(API_URL, json=paylaoad)
