@@ -6,12 +6,14 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel, Field
 from sqlalchemy.orm import Session
 from fastapi import Depends
+
+# Chỉ đường cho Python lùi ra 2 cấp để tìm thấy thư mục gốc 'src'
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+
 from src.app.db.database import get_db, engine, Base
 from src.app.db.schemas import prediction_history
 from src.data.preprocess import encode_categorical_columns
 
-# Chỉ đường cho Python lùi ra 2 cấp để tìm thấy thư mục gốc 'src'
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 # Lệnh này sẽ tự động tạo bảng trong PostgreSQL nếu bảng chưa tồn tại
 Base.metadata.create_all(bind=engine)
